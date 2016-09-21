@@ -11,3 +11,5 @@ record列表记录了每条轨迹的信息，点击可查看详细路线。
 * ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/recordlist.png)
 点击开始，轨迹回放。
 * ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/show.png)
+体验一下
+* ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/1474451650.png)
