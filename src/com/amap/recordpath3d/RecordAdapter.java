@@ -13,21 +13,22 @@ import com.example.recordpath3d.R;
 
 public class RecordAdapter extends BaseAdapter {
 
-	private Context ctx;
-    private List<PathRecord> list;
-    
-    public RecordAdapter(Context context, List<PathRecord> list) {
-        this.ctx = context;
-        this.list = list;
-    }
+	private Context mContext;
+	private List<PathRecord> mRecordList;
+
+	public RecordAdapter(Context context, List<PathRecord> list) {
+		this.mContext = context;
+		this.mRecordList = list;
+	}
+
 	@Override
 	public int getCount() {
-		return list.size();
+		return mRecordList.size();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		 return list.get(position);
+		return mRecordList.get(position);
 	}
 
 	@Override
@@ -38,26 +39,25 @@ public class RecordAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
-        if (convertView == null) {
-            holder = new ViewHolder();
-            convertView = View.inflate(ctx, R.layout.recorditem, null);
-            holder.date = (TextView) convertView.findViewById(R.id.date);
-            holder.record = (TextView) convertView
-                   .findViewById(R.id.record);
-            
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+		if (convertView == null) {
+			holder = new ViewHolder();
+			convertView = View.inflate(mContext, R.layout.recorditem, null);
+			holder.date = (TextView) convertView.findViewById(R.id.date);
+			holder.record = (TextView) convertView.findViewById(R.id.record);
 
-        PathRecord item = list.get(position);
-        holder.date.setText(item.getDate());
-        holder.record.setText(item.toString());
-        return convertView;
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+
+		PathRecord item = mRecordList.get(position);
+		holder.date.setText(item.getDate());
+		holder.record.setText(item.toString());
+		return convertView;
 	}
 
 	private class ViewHolder {
 		TextView date;
-        TextView record;
-    }
+		TextView record;
+	}
 }

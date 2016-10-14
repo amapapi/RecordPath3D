@@ -2,6 +2,7 @@ package com.amap.recordpath3d;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -30,106 +31,134 @@ import com.amap.database.DbAdapter;
 import com.amap.record.PathRecord;
 import com.example.recordpath3d.R;
 
-
-/**
- * AMapV2地图中介绍如何显示一个基本地图
- */
-public class MainActivity extends Activity implements LocationSource, AMapLocationListener {
-	private MapView mapView;
-	private AMap aMap;
+public class MainActivity extends Activity implements LocationSource,
+		AMapLocationListener {
+	private MapView mMapView;
+	private AMap mAMap;
 	private OnLocationChangedListener mListener;
-	private AMapLocationClient mlocationClient;
+	private AMapLocationClient mLocationClient;
 	private AMapLocationClientOption mLocationOption;
 	private PolylineOptions mPolyoptions;
 	private PathRecord record;
-	private long starttime;
-	private long endtime;
+	private long mStartTime;
+	private long mEndTime;
 	private ToggleButton btn;
 	private DbAdapter DbHepler;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.basicmap_activity);
-	    /*
-         * 设置离线地图存储目录，在下载离线地图或初始化地图设置;
-         * 使用过程中可自行设置, 若自行设置了离线地图存储的路径，
-         * 则需要在离线地图下载和使用地图页面都进行路径设置
-         * */
-	    //Demo中为了其他界面可以使用下载的离线地图，使用默认位置存储，屏蔽了自定义设置
-      //  MapsInitializer.sdcardDir =OffLineMapUtils.getSdCacheDir(this);
-		mapView = (MapView) findViewById(R.id.map);
-		mapView.onCreate(savedInstanceState);// 此方法必须重写
-	 
+		mMapView = (MapView) findViewById(R.id.map);
+		mMapView.onCreate(savedInstanceState);// 此方法必须重写
 		init();
 		initpolyline();
-		
 	}
 
 	/**
 	 * 初始化AMap对象
 	 */
 	private void init() {
-		if (aMap == null) {
-			aMap = mapView.getMap();
+		if (mAMap == null) {
+			mAMap = mMapView.getMap();
 			setUpMap();
 		}
-		btn = (ToggleButton)findViewById(R.id.locationbtn);
+		btn = (ToggleButton) findViewById(R.id.locationbtn);
 		btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (btn.isChecked()) {
-					Log.i("MY","isChecked");
+					Log.i("MY", "isChecked");
 
-					aMap.clear(true);
+					mAMap.clear(true);
 					if (record != null) {
-						record = null;	
+						record = null;
 					}
 					record = new PathRecord();
-					starttime = System.currentTimeMillis();
-					record.setDate(getcueDate(starttime));
+					mStartTime = System.currentTimeMillis();
+					record.setDate(getcueDate(mStartTime));
 				} else {
-					endtime = System.currentTimeMillis();
-					saverecord(record);
+					mEndTime = System.currentTimeMillis();
+					saveRecord(record.getPathline(), record.getDate());
 				}
 			}
 		});
-		
+
 	}
 
-	protected void saverecord(PathRecord record) {
-		if (record !=null && record.getPathline().size()>0) {
-			DbHepler=new DbAdapter(this);
-			DbHepler.open();  
-			record.setDuration(String.valueOf((endtime-starttime)/1000f));
-			float distance = 0;
-			String pathline = "";
-			for (int i = 0; i < record.getPathline().size(); i++) {
-				if (i < record.getPathline().size()-1) {
-					LatLng firstpoint = record.getPathline().get(i);
-					LatLng secoundpoint = record.getPathline().get(i+1);
-					distance = distance + AMapUtils.calculateLineDistance(firstpoint, secoundpoint);
-				}
-				LatLng point = record.getPathline().get(i);
-				pathline = pathline + point.latitude+","+point.longitude + ";";
-			}
-			record.setDistance(String.valueOf(distance));
-			record.setStartpoint(record.getPathline().get(0));
-			record.setAveragespeed(String.valueOf(distance/(float)(endtime-starttime)));
-			record.setEndpoint(record.getPathline().get(record.getPathline().size()-1));
-			
-			String stratpoint = record.getStartpoint().latitude+","+record.getStartpoint().longitude;
-			String endpoint = record.getEndpoint().latitude+","+record.getEndpoint().longitude;
-			DbHepler.createrecord(record.getDistance(), 
-					record.getDuration(),
-					record.getAveragespeed(), 
-					pathline, stratpoint, endpoint, 
-					record.getDate());
+	protected void saveRecord(List<AMapLocation> list, String time) {
+		if (list != null && list.size() > 0) {
+			DbHepler = new DbAdapter(this);
+			DbHepler.open();
+			String duration = getDuration();
+			float distance = getDistance(list);
+			String average = getAverage(distance);
+			String pathlineSring = getPathLineString(list);
+			AMapLocation firstLocaiton = list.get(0);
+			AMapLocation lastLocaiton = list.get(list.size() - 1);
+			String stratpoint = amapLocationToString(firstLocaiton);
+			String endpoint = amapLocationToString(lastLocaiton);
+			DbHepler.createrecord(String.valueOf(distance), duration, average,
+					pathlineSring, stratpoint, endpoint, time);
 			DbHepler.close();
 		} else {
-			Toast.makeText(MainActivity.this, "没有记录到路径", Toast.LENGTH_SHORT).show();
+			Toast.makeText(MainActivity.this, "没有记录到路径", Toast.LENGTH_SHORT)
+					.show();
 		}
-		
-		
+	}
+
+	private String getDuration() {
+		return String.valueOf((mEndTime - mStartTime) / 1000f);
+	}
+
+	private String getAverage(float distance) {
+		return String.valueOf(distance / (float) (mEndTime - mStartTime));
+	}
+
+	private float getDistance(List<AMapLocation> list) {
+		float distance = 0;
+		if (list == null || list.size() == 0) {
+			return distance;
+		}
+		for (int i = 0; i < list.size() - 1; i++) {
+			AMapLocation firstpoint = list.get(i);
+			AMapLocation secondpoint = list.get(i + 1);
+			LatLng firstLatLng = new LatLng(firstpoint.getLatitude(),
+					firstpoint.getLongitude());
+			LatLng secondLatLng = new LatLng(secondpoint.getLatitude(),
+					secondpoint.getLongitude());
+			double betweenDis = AMapUtils.calculateLineDistance(firstLatLng,
+					secondLatLng);
+			distance = (float) (distance + betweenDis);
+		}
+		return distance;
+	}
+
+	private String getPathLineString(List<AMapLocation> list) {
+		if (list == null || list.size() == 0) {
+			return "";
+		}
+		StringBuffer pathline = new StringBuffer();
+		for (int i = 0; i < list.size(); i++) {
+			AMapLocation location = list.get(i);
+			String locString = amapLocationToString(location);
+			pathline.append(locString).append(";");
+		}
+		String pathLineString = pathline.toString();
+		pathLineString = pathLineString.substring(0,
+				pathLineString.length() - 1);
+		return pathLineString;
+	}
+
+	private String amapLocationToString(AMapLocation location) {
+		StringBuffer locString = new StringBuffer();
+		locString.append(location.getLatitude()).append(",");
+		locString.append(location.getLongitude()).append(",");
+		locString.append(location.getProvider()).append(",");
+		locString.append(location.getTime()).append(",");
+		locString.append(location.getSpeed()).append(",");
+		locString.append(location.getBearing());
+		return locString.toString();
 	}
 
 	private void initpolyline() {
@@ -137,24 +166,25 @@ public class MainActivity extends Activity implements LocationSource, AMapLocati
 		mPolyoptions.width(10f);
 		mPolyoptions.color(Color.BLUE);
 	}
-	
+
 	/**
 	 * 设置一些amap的属性
 	 */
 	private void setUpMap() {
-		aMap.setLocationSource(this);// 设置定位监听
-		aMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-		aMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+		mAMap.setLocationSource(this);// 设置定位监听
+		mAMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
+		mAMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
 		// 设置定位的类型为定位模式 ，可以由定位、跟随或地图根据面向方向旋转几种
-		aMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
+		mAMap.setMyLocationType(AMap.LOCATION_TYPE_LOCATE);
 	}
+
 	/**
 	 * 方法必须重写
 	 */
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mapView.onResume();
+		mMapView.onResume();
 	}
 
 	/**
@@ -163,7 +193,7 @@ public class MainActivity extends Activity implements LocationSource, AMapLocati
 	@Override
 	protected void onPause() {
 		super.onPause();
-		mapView.onPause();
+		mMapView.onPause();
 	}
 
 	/**
@@ -172,7 +202,7 @@ public class MainActivity extends Activity implements LocationSource, AMapLocati
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		mapView.onSaveInstanceState(outState);
+		mMapView.onSaveInstanceState(outState);
 	}
 
 	/**
@@ -181,7 +211,7 @@ public class MainActivity extends Activity implements LocationSource, AMapLocati
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		mapView.onDestroy();
+		mMapView.onDestroy();
 	}
 
 	@Override
@@ -193,71 +223,73 @@ public class MainActivity extends Activity implements LocationSource, AMapLocati
 	@Override
 	public void deactivate() {
 		mListener = null;
-		if (mlocationClient != null) {
-			mlocationClient.stopLocation();
-			mlocationClient.onDestroy();
-			
+		if (mLocationClient != null) {
+			mLocationClient.stopLocation();
+			mLocationClient.onDestroy();
+
 		}
-		mlocationClient = null;	
+		mLocationClient = null;
 	}
 
 	@Override
 	public void onLocationChanged(AMapLocation amapLocation) {
 		if (mListener != null && amapLocation != null) {
-			if (amapLocation != null
-					&& amapLocation.getErrorCode() == 0) {
+			if (amapLocation != null && amapLocation.getErrorCode() == 0) {
 				mListener.onLocationChanged(amapLocation);// 显示系统小蓝点
-				LatLng mylocation = new LatLng(amapLocation.getLatitude(), amapLocation.getLongitude());
-				aMap.moveCamera(CameraUpdateFactory.changeLatLng(mylocation));
+				LatLng mylocation = new LatLng(amapLocation.getLatitude(),
+						amapLocation.getLongitude());
+				mAMap.moveCamera(CameraUpdateFactory.changeLatLng(mylocation));
 				if (btn.isChecked()) {
-					record.addpoint(mylocation);
+					record.addpoint(amapLocation);
 					mPolyoptions.add(mylocation);
 					redrawline();
-				}		
+				}
 			} else {
-				String errText = "定位失败," + amapLocation.getErrorCode()+ ": " + amapLocation.getErrorInfo();
-				Log.e("AmapErr",errText);
+				String errText = "定位失败," + amapLocation.getErrorCode() + ": "
+						+ amapLocation.getErrorInfo();
+				Log.e("AmapErr", errText);
 			}
 		}
 	}
-	
-	private void startlocation(){
-		if (mlocationClient == null) {
-			mlocationClient = new AMapLocationClient(this);
+
+	private void startlocation() {
+		if (mLocationClient == null) {
+			mLocationClient = new AMapLocationClient(this);
 			mLocationOption = new AMapLocationClientOption();
-			//设置定位监听
-			mlocationClient.setLocationListener(this);
-			//设置为高精度定位模式
+			// 设置定位监听
+			mLocationClient.setLocationListener(this);
+			// 设置为高精度定位模式
 			mLocationOption.setLocationMode(AMapLocationMode.Hight_Accuracy);
-			
+
 			mLocationOption.setInterval(2000);
-			//设置定位参数
-			mlocationClient.setLocationOption(mLocationOption);
+			// 设置定位参数
+			mLocationClient.setLocationOption(mLocationOption);
 			// 此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
 			// 注意设置合适的定位时间的间隔（最小间隔支持为2000ms），并且在合适时间调用stopLocation()方法来取消定位请求
 			// 在定位结束后，在合适的生命周期调用onDestroy()方法
 			// 在单次定位情况下，定位无论成功与否，都无需调用stopLocation()方法移除请求，定位sdk内部会移除
-			mlocationClient.startLocation();
-			
+			mLocationClient.startLocation();
+
 		}
 	}
 
 	private void redrawline() {
-		if (mPolyoptions.getPoints().size()>0) {
-			aMap.clear(true);
-			aMap.addPolyline(mPolyoptions);	
-		}	
-	}
-	
-	@SuppressLint("SimpleDateFormat") 
-	private String getcueDate(long time){
-		SimpleDateFormat formatter = new SimpleDateFormat ("yyyy-MM-dd  HH:mm:ss ");       
-		Date curDate = new Date(time);  
-		String date = formatter.format(curDate);
-		return date;       
+		if (mPolyoptions.getPoints().size() > 0) {
+			mAMap.clear(true);
+			mAMap.addPolyline(mPolyoptions);
+		}
 	}
 
-	public void record(View view){
+	@SuppressLint("SimpleDateFormat")
+	private String getcueDate(long time) {
+		SimpleDateFormat formatter = new SimpleDateFormat(
+				"yyyy-MM-dd  HH:mm:ss ");
+		Date curDate = new Date(time);
+		String date = formatter.format(curDate);
+		return date;
+	}
+
+	public void record(View view) {
 		Intent intent = new Intent(MainActivity.this, RecordActivity.class);
 		startActivity(intent);
 	}
