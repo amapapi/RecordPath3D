@@ -1,18 +1,21 @@
 # RecordPath3D 
-¸ßµÂAndroid¹ì¼£»Ø·ÅÊ¾Àıdemo
+é«˜å¾·Androidè½¨è¿¹å›æ”¾ç¤ºä¾‹demo
 ------------
 
-±¾¹¤³ÌÎª»ùÓÚ¸ßµÂµØÍ¼ºÍ¶¨Î»SDKµÄ¹ì¼£¼ÇÂ¼ºÍ»Ø·Å¹¦ÄÜÊ¾Àı¡£
+æœ¬å·¥ç¨‹ä¸ºåŸºäºé«˜å¾·åœ°å›¾å’Œå®šä½SDKçš„è½¨è¿¹è®°å½•å’Œï¼ˆå›æ”¾/è½¨è¿¹çº åå¤„ç†åå›æ”¾ï¼‰åŠŸèƒ½ç¤ºä¾‹ã€‚
 
-##Ğ§¹ûÍ¼ÈçÏÂ£º
-- µã»÷¿ªÊ¼¼ÇÂ¼¹ì¼££¬ÊµÊ±»­¹ì¼££¬µã»÷Í£Ö¹×Ô¶¯´æ´¢¹ì¼£Êı¾İµ½±¾µØ¡£µã»÷record½øÈë±¾µØÁĞ±í¡£
-* ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/location.jpg)
+##æ•ˆæœå›¾å¦‚ä¸‹ï¼š
+- ç‚¹å‡»å¼€å§‹è®°å½•è½¨è¿¹ï¼Œå®æ—¶ç”»è½¨è¿¹ï¼Œç‚¹å‡»åœæ­¢è‡ªåŠ¨å­˜å‚¨è½¨è¿¹æ•°æ®åˆ°æœ¬åœ°ã€‚ç‚¹å‡»recordè¿›å…¥æœ¬åœ°åˆ—è¡¨ã€‚
+* ![Screenshot](https://github.com/amapapi/RecordPath3D/raw/master/pic/location.jpg)
 
-- recordÁĞ±í¼ÇÂ¼ÁËÃ¿Ìõ¹ì¼£µÄĞÅÏ¢£¬µã»÷¿É²é¿´ÏêÏ¸Â·Ïß¡£
-* ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/recordlist.png)
+- recordåˆ—è¡¨è®°å½•äº†æ¯æ¡è½¨è¿¹çš„ä¿¡æ¯ï¼Œç‚¹å‡»å¯æŸ¥çœ‹è¯¦ç»†è·¯çº¿ã€‚
+* ![Screenshot](https://github.com/amapapi/RecordPath3D/raw/master/pic/recordlist.png)
 
-- µã»÷¿ªÊ¼£¬¹ì¼£»Ø·Å¡£
-* ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/show.png)
+- åŸå§‹è½¨è¿¹å›æ”¾æ•ˆæœå›¾ã€‚
+* ![Screenshot](https://github.com/amapapi/RecordPath3D/raw/master/pic/origin_trace_replay.png)
 
-##ÌåÑéÒ»ÏÂ
-* ![Screenshot](https://raw.githubusercontent.com/mayan0/RecordPath3D/master/pic/1474451650.png)
+- è½¨è¿¹çº åå¤„ç†åè½¨è¿¹å›æ”¾æ•ˆæœå›¾ã€‚
+* ![Screenshot](https://github.com/amapapi/RecordPath3D/raw/master/pic/grasped_trace_replay.png)
+
+##ä½“éªŒä¸€ä¸‹
+* ![Screenshot](https://github.com/amapapi/RecordPath3D/raw/master/pic/1474451650.png)

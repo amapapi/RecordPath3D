@@ -2,130 +2,102 @@ package com.amap.record;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.amap.api.location.AMapLocation;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+/**
+ * 用于记录一条轨迹，包括起点、终点、轨迹中间点、距离、耗时、平均速度、时间
+ * 
+ * @author ligen
+ * 
+ */
+public class PathRecord {
+	private AMapLocation mStartPoint;
+	private AMapLocation mEndPoint;
+	private List<AMapLocation> mPathLinePoints = new ArrayList<AMapLocation>();
+	private String mDistance;
+	private String mDuration;
+	private String mAveragespeed;
+	private String mDate;
+	private int mId = 0;
 
-import com.amap.api.maps.model.LatLng;
-
-public class PathRecord implements Parcelable{
-	private LatLng startpoint;
-	private LatLng endpoint;
-	private List<LatLng> pathline = new ArrayList<LatLng>();
-	private String distance;
-	private String duration;
-	private String averagespeed;
-	private String date;
-	private int id = 0;
-	
 	public PathRecord() {
-		
+
 	}
-		
+
 	public int getId() {
-		return id;
+		return mId;
 	}
 
 	public void setId(int id) {
-		this.id = id;
+		this.mId = id;
 	}
 
-	public LatLng getStartpoint() {
-		return startpoint;
+	public AMapLocation getStartpoint() {
+		return mStartPoint;
 	}
-	public void setStartpoint(LatLng startpoint) {
-		this.startpoint = startpoint;
+
+	public void setStartpoint(AMapLocation startpoint) {
+		this.mStartPoint = startpoint;
 	}
-	public LatLng getEndpoint() {
-		return endpoint;
+
+	public AMapLocation getEndpoint() {
+		return mEndPoint;
 	}
-	public void setEndpoint(LatLng endpoint) {
-		this.endpoint = endpoint;
+
+	public void setEndpoint(AMapLocation endpoint) {
+		this.mEndPoint = endpoint;
 	}
-	public List<LatLng> getPathline() {
-		return pathline;
+
+	public List<AMapLocation> getPathline() {
+		return mPathLinePoints;
 	}
-	public void setPathline(List<LatLng> pathline) {
-		this.pathline = pathline;
+
+	public void setPathline(List<AMapLocation> pathline) {
+		this.mPathLinePoints = pathline;
 	}
+
 	public String getDistance() {
-		return distance;
+		return mDistance;
 	}
+
 	public void setDistance(String distance) {
-		this.distance = distance;
+		this.mDistance = distance;
 	}
+
 	public String getDuration() {
-		return duration;
+		return mDuration;
 	}
+
 	public void setDuration(String duration) {
-		this.duration = duration;
+		this.mDuration = duration;
 	}
+
 	public String getAveragespeed() {
-		return averagespeed;
+		return mAveragespeed;
 	}
+
 	public void setAveragespeed(String averagespeed) {
-		this.averagespeed = averagespeed;
+		this.mAveragespeed = averagespeed;
 	}
-	
+
 	public String getDate() {
-		return date;
+		return mDate;
 	}
 
 	public void setDate(String date) {
-		this.date = date;
+		this.mDate = date;
 	}
 
-	public void addpoint(LatLng point){
-		pathline.add(point);
+	public void addpoint(AMapLocation point) {
+		mPathLinePoints.add(point);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder record = new StringBuilder();
-		record.append("point:"+getPathline().size()+", ");
-		record.append("distance:"+getDistance()+"m, ");
-		record.append("duration:"+getDuration()+"s");
+		record.append("recordSize:" + getPathline().size() + ", ");
+		record.append("distance:" + getDistance() + "m, ");
+		record.append("duration:" + getDuration() + "s");
 		return record.toString();
 	}
-
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeValue(startpoint);
-		dest.writeValue(endpoint);
-		dest.writeTypedList(pathline);
-		dest.writeString(distance);
-		dest.writeString(duration);
-		dest.writeString(averagespeed);
-		dest.writeString(date);
-		
-	}
-	
-	protected PathRecord(Parcel parcel) {
-		startpoint = (LatLng)parcel.readValue(LatLng.class.getClassLoader());
-		endpoint = (LatLng)parcel.readValue(LatLng.class.getClassLoader());
-		pathline = parcel.createTypedArrayList(LatLng.CREATOR);
-		distance = parcel.readString();
-		duration = parcel.readString();
-		averagespeed = parcel.readString();
-		date = parcel.readString();
-	}
-	
-	
-	public static final Parcelable.Creator<PathRecord> CREATOR = new Parcelable.Creator<PathRecord>() {
-		public PathRecord createFromParcel(Parcel parcel) {
-			return new PathRecord(parcel);
-		}
-
-		public PathRecord[] newArray(int size) {
-			return new PathRecord[size];
-		}
-	};
-	
-	
 }
